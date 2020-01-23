@@ -36,17 +36,14 @@ public class UserService implements UserDetailsService {
 		/**
 		 * these roles would be fetched from database i.e based on userName
 		 */
-		
-		authorities.add(new SimpleGrantedAuthority("ROLE_"+"user"));
-		return new User("normal", "demo", authorities);
-		
-		/*
-		 * else { authorities.add(new SimpleGrantedAuthority("ROLE_"+"admin"));
-		 * authorities.add(new SimpleGrantedAuthority("ROLE_"+"superAdmin")); return new
-		 * User("admin", "demo", authorities); }
-		 */
-
-		
+		if (username.equals("normal")) {
+			authorities.add(new SimpleGrantedAuthority("ROLE_" + "user"));
+			return new User("normal", "normal", authorities);
+		} else {
+			authorities.add(new SimpleGrantedAuthority("ROLE_" + "admin"));
+			authorities.add(new SimpleGrantedAuthority("ROLE_" + "superAdmin"));
+			return new User("admin", "admin", authorities);
+		}
 
 	}
 
