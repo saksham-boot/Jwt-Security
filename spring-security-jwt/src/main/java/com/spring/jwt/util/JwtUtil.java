@@ -51,6 +51,9 @@ public class JwtUtil {
 	}
 
 	/**
+	 * 
+	 * HMACSHA256(base64UrlUrlEncode(header) + "." + base64UrlEncode(payload) ,secret)
+	 * 
 	 * specific claims we can add for creating token
 	 * @param claims
 	 * @param subject  ---> (username) who is being authenticated 

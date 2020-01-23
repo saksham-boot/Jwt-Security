@@ -35,7 +35,7 @@ public class HelloController {
 		return "Welcome to Spring Security with JWT";
 	}
 
-	@RequestMapping(method = RequestMethod.POST, value = "/Authenticate")
+	@RequestMapping(method = RequestMethod.POST, value = "/login")
 	public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthorizationRequest authorizationRequest) {
 		/*
 		 * Authentication manager will go to Authentication Providers(Many providers are

@@ -19,6 +19,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import com.spring.jwt.util.JwtUtil;
 import com.spring.jwt.util.UserService;
 
+import io.jsonwebtoken.MalformedJwtException;
+
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
 
@@ -35,12 +37,17 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 		String jwtToken = null;
 		String userName = null;
 		final String authorizationHeader = request.getHeader("Authorization");
-
+		
 		if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
 
 			jwtToken = authorizationHeader.substring(7);
 
+			try {
 			userName = jwtUtil.extractUsername(jwtToken);
+			}catch (MalformedJwtException e) {
+				response.setStatus(HttpStatus.UNAUTHORIZED.value());
+				return;
+			}
 		}
 
 		if (userName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -57,6 +64,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 				 * we are only doing this when we have a valid jwt Token.
 				 * 
 				 */
+				
+				
 				UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
                 usernamePasswordAuthenticationToken
