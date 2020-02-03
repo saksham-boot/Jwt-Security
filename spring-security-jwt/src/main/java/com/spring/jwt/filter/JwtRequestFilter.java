@@ -4,6 +4,8 @@ import java.io.IOException;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -14,15 +16,17 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
+import org.springframework.web.filter.GenericFilterBean;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.spring.jwt.util.JwtUtil;
 import com.spring.jwt.util.UserService;
 
-import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 
 @Component
-public class JwtRequestFilter extends OncePerRequestFilter {
+public class JwtRequestFilter extends GenericFilterBean  {
 
 	@Autowired
 	UserService userService;
@@ -31,21 +35,41 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 	JwtUtil jwtUtil;
 
 	@Override
-	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-			throws ServletException, IOException {
+	public void doFilter(ServletRequest request1, ServletResponse response1, FilterChain filterChain)
+			throws IOException, ServletException {
+		// TODO Auto-generated method stub
 
 		String jwtToken = null;
 		String userName = null;
-		final String authorizationHeader = request.getHeader("Authorization");
 		
+		final HttpServletRequest request = (HttpServletRequest) request1;
+		final HttpServletResponse response = (HttpServletResponse) response1;
+		
+		final String authorizationHeader = request.getHeader("Authorization");
+		boolean jwtResult = false;
+		
+		
+		 if ("OPTIONS".equals(request.getMethod())) {
+		        response.setStatus(HttpServletResponse.SC_OK);
+
+		        filterChain.doFilter(request, response); // go to next filter 
+		    } 
+		 
+		 if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+
+			 response.setStatus(HttpStatus.UNAUTHORIZED.value());
+				
+				return;
+		 }
 		if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
 
 			jwtToken = authorizationHeader.substring(7);
 
 			try {
 			userName = jwtUtil.extractUsername(jwtToken);
-			}catch (MalformedJwtException e) {
+			}catch (JwtException e) {
 				response.setStatus(HttpStatus.UNAUTHORIZED.value());
+				
 				return;
 			}
 		}
@@ -53,12 +77,21 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 		if (userName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 			UserDetails userDetails = userService.loadUserByUsername(userName);
 
-			if (!jwtUtil.validateToken(jwtToken, userDetails)) {
+			
+			try {
+		    jwtResult = jwtUtil.validateToken(jwtToken, userDetails);
+			}
+			catch (ExpiredJwtException e) {
 				response.setStatus(HttpStatus.UNAUTHORIZED.value());
 				return;
 			}
-			else
+			
+			if(!jwtResult)
 			{
+				response.setStatus(HttpStatus.UNAUTHORIZED.value());
+				return;
+			}
+			
 				/**
 				 * what would have default by spring security , automatically.
 				 * we are only doing this when we have a valid jwt Token.
@@ -66,17 +99,14 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 				 */
 				
 				
-				UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities());
-                usernamePasswordAuthenticationToken
-                        .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-			}
-
+				
+			
 		}
 
 		filterChain.doFilter(request, response); // go to next filter 
 
 	}
+
+	
 
 }

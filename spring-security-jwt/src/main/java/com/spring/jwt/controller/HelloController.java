@@ -1,5 +1,7 @@
 package com.spring.jwt.controller;
 
+import java.util.ArrayList;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -7,6 +9,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,8 +25,6 @@ import com.spring.jwt.util.JwtUtil;
 @RestController
 public class HelloController {
 
-	@Autowired
-	AuthenticationManager authenticationManager;
 
 	@Autowired
 	UserDetailsService userDetailService;
@@ -41,14 +43,30 @@ public class HelloController {
 		 * Authentication manager will go to Authentication Providers(Many providers are
 		 * there) for Authentication userName and Password
 		 */
-		Authentication authProvider = new UsernamePasswordAuthenticationToken(authorizationRequest.getUsername(),
-				authorizationRequest.getPassword());
-		try {
-			authenticationManager.authenticate(authProvider);
 
-		} catch (BadCredentialsException e) {
-			return new ResponseEntity<>("Incorrect Credentials", HttpStatus.NOT_FOUND);
-		}
+		/*
+		 * when we are confirm that user is valid and its role , just we need to check
+		 * token , rather than credentials
+		 */
+		/*
+		 * Authentication authentication = new
+		 * UsernamePasswordAuthenticationToken(authorizationRequest.getUsername(),
+		 * authorizationRequest.getPassword(), AuthorityUtils.createAuthorityList());
+		 * 
+		 * SecurityContextHolder.getContext().setAuthentication(authentication);
+		 */
+
+		// when we want spring to check whether user is valid/invalid
+
+		/*
+		 * Authentication authProvider = new
+		 * UsernamePasswordAuthenticationToken(authorizationRequest.getUsername(),
+		 * authorizationRequest.getPassword()); try {
+		 * authenticationManager.authenticate(authProvider);
+		 * 
+		 * } catch (BadCredentialsException e) { return new
+		 * ResponseEntity<>("Incorrect Credentials", HttpStatus.UNAUTHORIZED); }
+		 */
 
 		/**
 		 * when credentails are correct then load the userDetails , by using
@@ -58,8 +76,6 @@ public class HelloController {
 		UserDetails details = userDetailService.loadUserByUsername(authorizationRequest.getUsername());
 
 		final String jwtToken = jwtCreater.generateToken(details);
-		
-			
 
 		return new ResponseEntity<>(new AuthorizationResponse(jwtToken), HttpStatus.OK);
 
