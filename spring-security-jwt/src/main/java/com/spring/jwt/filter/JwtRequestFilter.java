@@ -11,13 +11,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
-import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.spring.jwt.util.JwtUtil;
 import com.spring.jwt.util.UserService;
@@ -34,6 +31,8 @@ public class JwtRequestFilter extends GenericFilterBean  {
 	@Autowired
 	JwtUtil jwtUtil;
 
+	 
+	 
 	@Override
 	public void doFilter(ServletRequest request1, ServletResponse response1, FilterChain filterChain)
 			throws IOException, ServletException {
@@ -74,7 +73,7 @@ public class JwtRequestFilter extends GenericFilterBean  {
 			}
 		}
 
-		if (userName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+		if (userName != null) {
 			UserDetails userDetails = userService.loadUserByUsername(userName);
 
 			

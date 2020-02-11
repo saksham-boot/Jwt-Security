@@ -32,9 +32,14 @@ public class HelloController {
 	@Autowired
 	JwtUtil jwtCreater;
 
-	@RequestMapping(method = RequestMethod.GET, value = "/security")
+	@RequestMapping(method = RequestMethod.GET, value = "/abc")
+	public String hello1() {
+		return "Welcome to Spring Security with abc";
+	}
+	
+	@RequestMapping(method = RequestMethod.GET, value = "/test/security")
 	public String hello() {
-		return "Welcome to Spring Security with JWT";
+		return "Welcome to Spring Security with sec";
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/login")

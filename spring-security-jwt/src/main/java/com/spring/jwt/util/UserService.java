@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -39,14 +40,9 @@ public class UserService implements UserDetailsService {
 		/**
 		 * these roles would be fetched from database i.e based on userName
 		 */
-		if (username.equals("normal")) {
-		//	authorities.add(new SimpleGrantedAuthority("ROLE_" + "user"));
-			return new User("normal", "normal", authorities);
-		} else {
-			authorities.add(new SimpleGrantedAuthority("ROLE_" + "admin"));
-			//authorities.add(new SimpleGrantedAuthority("ROLE_" + "superAdmin"));
-			return new User("admin", "admin", authorities);
-		}
+		
+			return new User("normal", "",authorities);
+		
 
 	}
 

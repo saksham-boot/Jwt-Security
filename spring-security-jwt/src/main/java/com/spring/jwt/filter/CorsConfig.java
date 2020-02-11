@@ -1,6 +1,13 @@
 package com.spring.jwt.filter;
 
 
+import java.io.IOException;
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -25,11 +32,12 @@ public class CorsConfig {
 		final FilterRegistrationBean<GenericFilterBean > bean = new FilterRegistrationBean<GenericFilterBean >();
 		
 		bean.setFilter(jwtRequestFilter);
-		bean.addUrlPatterns("/security/*");
+		bean.addUrlPatterns("/security/*","/abc/*");
 		bean.setOrder(0);
 		
 		return bean;
 	}
+	
 
 	
 }
