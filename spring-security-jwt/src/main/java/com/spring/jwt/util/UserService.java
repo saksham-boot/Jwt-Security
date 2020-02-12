@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -13,10 +12,15 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 @Service
 public class UserService implements UserDetailsService {
+ 
+	private final JwtUtil jwtCreater;
+
+	public UserService(JwtUtil jwtCreater) {
+		this.jwtCreater = jwtCreater;
+	}
 
 	/**
 	 * Spring security will call this method and passed the userName
@@ -40,15 +44,18 @@ public class UserService implements UserDetailsService {
 		/**
 		 * these roles would be fetched from database i.e based on userName
 		 */
-		
+		;
 			return new User("normal", "",authorities);
 		
 
 	}
 
-	@Bean
-	public PasswordEncoder passwordEncode() {
-		return NoOpPasswordEncoder.getInstance();
+	
+	
+	public String getToken(String name) {
+		UserDetails details = loadUserByUsername(name);
+		final String jwtToken = jwtCreater.generateToken(details);
+		return jwtToken;
 	}
 
 }

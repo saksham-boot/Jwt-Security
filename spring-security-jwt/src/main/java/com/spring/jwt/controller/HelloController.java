@@ -21,16 +21,17 @@ import org.springframework.web.bind.annotation.RestController;
 import com.spring.jwt.models.AuthorizationRequest;
 import com.spring.jwt.models.AuthorizationResponse;
 import com.spring.jwt.util.JwtUtil;
+import com.spring.jwt.util.UserService;
 
 @RestController
 public class HelloController {
 
+	private final UserService userService;
 
-	@Autowired
-	UserDetailsService userDetailService;
+	public HelloController(UserService userService) {
+		this.userService = userService;
+	}
 
-	@Autowired
-	JwtUtil jwtCreater;
 
 	@RequestMapping(method = RequestMethod.GET, value = "/abc")
 	public String hello1() {
@@ -78,9 +79,8 @@ public class HelloController {
 		 * loadUsername --> fetch the data and produce JWT.
 		 */
 
-		UserDetails details = userDetailService.loadUserByUsername(authorizationRequest.getUsername());
 
-		final String jwtToken = jwtCreater.generateToken(details);
+		final String jwtToken =userService.getToken(authorizationRequest.getUsername());
 
 		return new ResponseEntity<>(new AuthorizationResponse(jwtToken), HttpStatus.OK);
 

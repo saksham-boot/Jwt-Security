@@ -24,8 +24,13 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 @Configuration
 public class CorsConfig {
 
-	@Autowired
-	private JwtRequestFilter jwtRequestFilter;
+	private final JwtRequestFilter jwtRequestFilter;
+	
+	public CorsConfig(JwtRequestFilter jwtRequestFilter) {
+		this.jwtRequestFilter = jwtRequestFilter;
+	}
+	
+	
 	@Bean
 	public FilterRegistrationBean<GenericFilterBean> corsFilter() {
 		
@@ -41,3 +46,4 @@ public class CorsConfig {
 
 	
 }
+
