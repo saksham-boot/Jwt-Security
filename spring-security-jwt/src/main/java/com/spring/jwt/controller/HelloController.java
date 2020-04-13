@@ -3,6 +3,7 @@ package com.spring.jwt.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -30,6 +31,7 @@ public class HelloController {
 	@Autowired
 	JwtUtil jwtCreater;
 
+	@Secured ({"ROLE_admin", "ROLE_superAdmin"})
 	@RequestMapping(method = RequestMethod.GET, value = "/security")
 	public String hello() {
 		return "Welcome to Spring Security with JWT";
